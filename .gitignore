@@ -1,0 +1,11 @@
+## ignore build sif files
+*.sif
+
+## ignore logs
+**/*.log
+
+## ignore apptainer cache folder
+cache
+
+## ignore vagrant stuff
+.vagrant

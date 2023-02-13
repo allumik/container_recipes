@@ -1,0 +1,83 @@
+## >>> "r-bioverse-dev-fat" <<<
+## allumik/r-bioverse-dev-fat
+## R bioinf focused development SingularityCE container
+
+Bootstrap: docker
+From: allumik/r-bioverse:fat
+
+%labels
+  Maintainer Alvin Meltsov
+  Alpine_version 3.15.5
+
+%help
+  Kinda minimal image for a development environment including:
+    * tidyverse
+    * RMarkdown rendering
+    * BioConductor support
+    * littler scripts for package installation
+    * DESeq2, limma+voom, edgeR
+    * Seurat, SCDior, sctransform
+
+%environment
+  # Set the locale
+  export LANG=en_US.UTF-8
+  export LANGUAGE=en_US:en
+  export LC_ALL=en_US.UTF-8
+  ## ensure installation is stripped
+  export DEBIAN_FRONTEND=noninteractive
+  ## set timezone to be UTC
+  export TZ=UTC
+
+
+%post
+  # Set the locale
+  export LANG=en_US.UTF-8
+  export LANGUAGE=en_US:en
+  export LC_ALL=en_US.UTF-8
+  ## ensure installation is stripped
+  export DEBIAN_FRONTEND=noninteractive
+  ## set timezone to be UTC
+  export TZ=UTC
+
+  ## preinstall some packages with hotfixes not yet propagated to CRAN
+  installGithub.r --deps TRUE --update TRUE \
+    lme4/lme4 astamm/nloptr
+
+  ## Install additional R packages from R-Forge and CRAN
+  install2.r --ncpus 8 --skipinstalled --error -r http://R-Forge.R-project.org \
+    Matrix
+  install2.r --ncpus 8 --skipinstalled --error -r http://cran.rstudio.com/ \
+    ggpubr ggvenn heatmaply viridis RColorBrewer glue magrittr \
+    embed broom modelr mltools vip umap snow tictoc \
+    Exact corrr statmod psych ranger remotes git2r \
+    rmdformats doParallel tidymodels recipes reactable 
+
+  ## Install Bioconductor packages
+  installBioc.r --ncpus 8 --skipinstalled --error \
+    DESeq2 edgeR limma sva rtracklayer biomaRt GenomicRanges \
+    Seurat Rsamtools GenomicAlignments hdf5r SingleCellExperiment \
+    glmGamPoi
+
+
+  ## Install packages from Git and clean up temporary files
+  installGithub.r --deps TRUE --update TRUE \
+    mojaveazure/seurat-disk JiekaiLab/dior
+  
+  rm -rf /tmp/downloaded_packages /tmp/*.rds
+
+
+%test
+  ## test if the binaries are available
+  R --vanilla || true
+	install.r || true
+  install2.r || true
+  installBioc.r || true
+  installDeps.r || true
+  installGithub.r || true
+  testInstalled.r || true
+  knit.r || true
+  echo "The eddelbuettel/littler executables are in the PATH and work as expected."
+  ## Test the installed packages from `tools` package
+  ## TODO - make `testInstalled.r` non-write for tests
+  # r -e "tools::testInstalledPackages()"
+
