@@ -35,6 +35,7 @@ ENV BASE_DEPS='''\
   openssl-dev \
   pcre-dev pcre2-dev \
   readline-dev \
+  libc6-compat \
   xz-dev \
   zlib-dev \
   bzip2-dev \
@@ -89,22 +90,29 @@ RUN \
   dvisvgm
 
 ## Set the default installer location for the appuser
-ENV R_LIBS_USER="/home/appuser/"
+ENV R_LIBS_USER="/home/appuser/R/library/"
 
-## Install eddelbuettel/littler, devtools and symlink the littler executables
-RUN R -e "install.packages(c('littler', 'remotes'), dependencies = TRUE, repos = 'http://cran.rstudio.com/')" \
-	&& ln -s /usr/lib/R/library/littler/bin/r /home/appuser/.local/bin/r \
-	&& ln -s /usr/lib/R/library/littler/examples/*.r /home/appuser/.local/
+## Install eddelbuettel/littler, devtools
+RUN \
+  mkdir -p "${R_LIBS_USER}" \
+  && R -e "install.packages(c('littler', 'remotes'), dependencies = TRUE, repos = 'http://cran.rstudio.com/')"
+
+## symlink the littr executables
+RUN \
+  mkdir -p /home/appuser/.local/bin/ \
+	&& ln -s ${R_LIBS_USER}/littler/bin/r /home/appuser/.local/bin/r \
+	&& ln -s ${R_LIBS_USER}/littler/examples/*.r /home/appuser/.local/bin/
+  
 
 ## NB! - install prior packages from GH
 ## 22.11.06 - when this https://github.com/tidyverse/readxl/pull/708 gets updated to CRAN and propagated to tidyverse, 
 ## move back to previous step or install just new version of tidyverse.
 ## Also BH does not compile in musl systems rn https://github.com/r-hub/r-minimal/issues/53
-RUN installGithub.r --deps TRUE \
-    tidyverse/readxl@1835c96 gaborcsardi/BH@fix/musl
-
-## Install basic + tidyverse packages in R
-RUN install2.r --ncpus 8 --skipinstalled --error -r http://cran.rstudio.com/ \
-  BiocManager haven tidyverse plotly devtools languageserver renv knitr \
-  && r -e "tinytex::install_tinytex()" \
-  && rm -rf /tmp/downloaded_packages /tmp/*.rds
+# RUN installGithub.r --deps TRUE \
+#     tidyverse/readxl@1835c96 gaborcsardi/BH@fix/musl
+# 
+# ## Install basic + tidyverse packages in R
+# RUN install2.r --ncpus 8 --skipinstalled --error -r http://cran.rstudio.com/ \
+#   BiocManager haven tidyverse plotly devtools languageserver renv knitr \
+#   && r -e "tinytex::install_tinytex()" \
+#   && rm -rf /tmp/downloaded_packages /tmp/*.rds
