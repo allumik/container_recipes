@@ -77,7 +77,7 @@ RUN apt install -y \
 # Needs a "haven" fix (somehow not linking proper LD libraries): https://github.com/tidyverse/haven/issues/363
 RUN install2.r --ncpus 8 --skipinstalled --error -r http://cran.rstudio.com/ \
   BiocManager tidyverse plotly devtools languageserver renv knitr tinytex Rcpp \
-  && r -e "tinytex::install_tinytex()"
+  && r -e "tinytex::install_tinytex(force = TRUE)"
 
 ## Clean up temporary files
 RUN apt autoremove -y && apt clean \

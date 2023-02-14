@@ -3,7 +3,7 @@
 ## R bioinf focused development SingularityCE container
 
 Bootstrap: docker
-From: allumik/r-bioverse:fat
+From: allumik/r-bioverse
 
 %labels
   Maintainer Alvin Meltsov

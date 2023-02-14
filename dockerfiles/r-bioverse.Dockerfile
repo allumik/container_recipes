@@ -22,6 +22,10 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 WORKDIR /home/appuser
 RUN chown appuser:appgroup -R /home/appuser
 
+# add appuser binaries to path
+# RUN echo "export PATH='/home/appuser/.local/bin/:$PATH'" >> /etc/profile
+ENV PATH "$PATH:/home/appuser/.local/bin/"
+
 ## Base deps
 ENV BASE_DEPS='''\
   libintl linux-headers gcc g++ gfortran make \
@@ -47,7 +51,6 @@ ENV BASE_DEPS='''\
 ## https://pkgs.alpinelinux.org/packages
 RUN apk upgrade --update \
   && apk add --no-cache --virtual persistent ${BASE_DEPS}
-
 
 ## Add additional deps for next steps
 ## Separated for quicker rebuild if adding deps :)
@@ -108,11 +111,12 @@ RUN \
 ## 22.11.06 - when this https://github.com/tidyverse/readxl/pull/708 gets updated to CRAN and propagated to tidyverse, 
 ## move back to previous step or install just new version of tidyverse.
 ## Also BH does not compile in musl systems rn https://github.com/r-hub/r-minimal/issues/53
-# RUN installGithub.r --deps TRUE \
-#     tidyverse/readxl@1835c96 gaborcsardi/BH@fix/musl
-# 
-# ## Install basic + tidyverse packages in R
-# RUN install2.r --ncpus 8 --skipinstalled --error -r http://cran.rstudio.com/ \
-#   BiocManager haven tidyverse plotly devtools languageserver renv knitr \
-#   && r -e "tinytex::install_tinytex()" \
-#   && rm -rf /tmp/downloaded_packages /tmp/*.rds
+RUN installGithub.r --deps TRUE \
+    tidyverse/readxl@1835c96 gaborcsardi/BH@fix/musl
+
+## Install basic + tidyverse packages in R
+# Force tinytex instalation just to be sure that it gets linked to R
+RUN install2.r --ncpus 8 --skipinstalled --error -r http://cran.rstudio.com/ \
+  BiocManager haven tidyverse plotly devtools languageserver renv knitr \
+  && r -e "tinytex::install_tinytex(force = T)" \
+  && rm -rf /tmp/downloaded_packages /tmp/*.rds

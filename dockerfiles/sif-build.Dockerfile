@@ -9,6 +9,22 @@ ENV _R_SHLIB_STRIP_=true
 ## Alpine does not detect timezone
 ENV TZ=UTC
 
-RUN \
-  echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
-  apk add libattr apptainer@testing
+# install the apptainer package in the edge
+RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
+  apk add libattr sudo shadow-uidmap apptainer@testing
+
+ENV NEWUSER='appuser'
+
+# add user with root privs
+RUN addgroup -S appgroup \
+  && adduser -S $NEWUSER -G appgroup \
+  && echo "$NEWUSER ALL=(ALL) ALL" > /etc/sudoers.d/$NEWUSER \
+  && chmod 0440 /etc/sudoers.d/$NEWUSER \
+  && echo ${NEWUSER}:100000:65536 >/etc/subuid \
+  && echo ${NEWUSER}:100000:65536 >/etc/subgid
+
+# setup workdir
+WORKDIR /home/${NEWUSER}
+RUN chown $NEWUSER:appgroup -R /home/${NEWUSER} && mkdir /home/$NEWUSER/app
+
+USER appuser

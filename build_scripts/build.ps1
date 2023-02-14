@@ -14,12 +14,11 @@ Get-Content ".\r-bioverse.Dockerfile" | docker build --progress=plain --tag "all
 docker image push allumik/r-bioverse:fat
 
 #Run Singularity/Apptainer in WSL in su and build the SIF file (note: "`" is for escaping PS piping or newlines)
-#Could also be done in vagrant
 [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secpass)) | `
   wsl sudo -S singularity build --force r-bioverse-dev.sif r-bioverse-dev.def `| tee ../build.log
 
 
-#Aaand go get a cup of coffee!
+## Aaand go get a cup of coffee ☕️
 
 
 #Did anything go wrong?

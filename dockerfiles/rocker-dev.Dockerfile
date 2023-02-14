@@ -1,5 +1,5 @@
 ## >>> "r-bioverse" <<<
-## allumik/r-bioverse
+## allumik/r-bioverse - older version based on rocker verse
 ## R bioinf focused development docker with radian terminal
 ## `--gpus all` ... to utilize GPU's
 ## `ROOT=true` ... to add default user to sudoers
