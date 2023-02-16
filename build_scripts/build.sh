@@ -21,5 +21,5 @@ vagrant up && vagrant ssh -c "cd /vagrant/project/ && apptainer build --force ./
 
 ## ☕️
 
-## Anything went wrong while you were out?
+## Anything went wrong while you were browsing HackerNews?
 # cat "./build.log" | grep error

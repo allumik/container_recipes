@@ -63,6 +63,8 @@ ENV ADDIT_DEPS='''\
   sqlite \
   geos-dev \
   openblas-dev \
+  gsl-dev \
+  hdf5 \
   lapack-dev \
   harfbuzz harfbuzz-dev \
   fribidi fribidi-dev \

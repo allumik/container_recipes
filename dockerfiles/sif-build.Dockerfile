@@ -11,7 +11,7 @@ ENV TZ=UTC
 
 # install the apptainer package in the edge
 RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
-  apk add libattr sudo shadow-uidmap apptainer@testing
+  apk add libattr apptainer@testing
 
 ENV NEWUSER='appuser'
 
@@ -24,7 +24,5 @@ RUN addgroup -S appgroup \
   && echo ${NEWUSER}:100000:65536 >/etc/subgid
 
 # setup workdir
-WORKDIR /home/${NEWUSER}
-RUN chown $NEWUSER:appgroup -R /home/${NEWUSER} && mkdir /home/$NEWUSER/app
-
-USER appuser
+RUN mkdir /app
+WORKDIR /app

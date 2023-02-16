@@ -8,17 +8,20 @@
 $secpass = Read-Host "Your WSL admin password" -AsSecureString
 
 #Build the Docker base container
-Get-Content ".\r-bioverse.Dockerfile" | docker build --progress=plain --tag "allumik/r-bioverse" - *>> ../build.log
+Get-Content "..\dockerfiles\r-bioverse.Dockerfile" | docker build --progress=plain --tag "allumik/r-bioverse" - *>> ../build.log
 
 #Push the container to DockerHub
-docker image push allumik/r-bioverse:fat
+docker image push allumik/r-bioverse
 
 #Run Singularity/Apptainer in WSL in su and build the SIF file (note: "`" is for escaping PS piping or newlines)
 [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secpass)) | `
-  wsl sudo -S singularity build --force r-bioverse-dev.sif r-bioverse-dev.def `| tee ../build.log
+  wsl sudo -S apptainer build --force r-bioverse-dev.sif r-bioverse-dev.def `| tee ../build.log
+
+#Or run it in a Docker container instead of WSL
+# docker run --mount type=bind,source=$curr_dirr,target=/home/appuser/app/ -it kaczmarj/apptainer
 
 
-## Aaand go get a cup of coffee ☕️
+## Aaand go get a cup of coffee ☕️!
 
 
 #Did anything go wrong?
