@@ -64,7 +64,7 @@ ENV ADDIT_DEPS='''\
   geos-dev \
   openblas-dev \
   gsl-dev \
-  hdf5 \
+  hdf5-dev \
   lapack-dev \
   harfbuzz harfbuzz-dev \
   fribidi fribidi-dev \

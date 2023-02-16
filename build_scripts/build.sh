@@ -1,25 +1,26 @@
-#!/bin/env/bash
+#!/bin/bash
 
 ## Bash version of the build process, meant for MacOS
 ## in linux you can run singularity natively
 
-# Build the Docker base container
-docker build --progress=plain --tag "allumik/r-bioverse" - < ../dockerfiles/r-bioverse.Dockerfile >> ./build.log
+# Get the project full path from the parent folder
+PRJ_PATH=$(pwd ..)
 
-# Push it to DockerHub
+## Build the Docker base container
+docker build --progress=plain --tag "allumik/r-bioverse" - < "$PRJ_PATH/dockerfiles/r-bioverse.Dockerfile" >> "$PRJ_PATH/build.log"
+
+## Push it to DockerHub
 docker image push allumik/r-bioverse
 # docker image push allumik/r-bioverse:ubuntu
 # docker image push allumik/r-bioverse:dev
 
-# Build Docker container for Singularity/Apptainer
-docker build --progress=plain --tag "allumik/sif-builder" - < ../dockerfiles/sif-builder.Dockerfile >> ./build.log
+## Build Docker container for Singularity/Apptainer
+docker build --progress=plain --tag "allumik/sif-builder" - < "$PRJ_PATH/dockerfiles/sif-build.Dockerfile" >> "$PRJ_PATH/build.log"
 
-# Run Singularity/Apptainer from docker
-docker exec apptainer build ./test.sif ./def_files/r-bioverse.def
-
-vagrant up && vagrant ssh -c "cd /vagrant/project/ && apptainer build --force ./r-bioverse-dev.sif ./def_files/r-bioverse-dev.def" | tee ./build.log
+## Run Singularity/Apptainer from docker as privileged user
+docker run --privileged -v "$PRJ_PATH":"/app" allumik/sif-builder build /app/r-bioverse-dev.sif /app/def_files/r-bioverse-dev.def >> "$PRJ_PATH/build.log"
 
 ## ☕️
 
-## Anything went wrong while you were browsing HackerNews?
+## Anything went wrong while browsing HackerNews?
 # cat "./build.log" | grep error

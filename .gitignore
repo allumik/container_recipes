@@ -3,6 +3,7 @@
 
 ## ignore logs
 **/*.log
+**/*history
 
 ## ignore apptainer cache folder
 cache
