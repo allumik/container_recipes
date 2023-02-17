@@ -1,9 +1,9 @@
-## >>> "r-bioverse-dev-fat" <<<
-## allumik/r-bioverse-dev-fat
+## >>> "r-bioverse-dev" <<<
+## allumik/r-bioverse based development environment
 ## R bioinf focused development SingularityCE container
 
 Bootstrap: docker
-From: allumik/r-bioverse
+From: allumik/r-bioverse:latest
 
 %labels
   Maintainer Alvin Meltsov
