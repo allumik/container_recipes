@@ -20,6 +20,10 @@ docker build --progress=plain --tag "allumik/sif-builder" - < "$PRJ_PATH/dockerf
 ## Run Singularity/Apptainer from docker as privileged user
 docker run --privileged -v "$PRJ_PATH":"/app" allumik/sif-builder build /app/r-bioverse-dev.sif /app/def_files/r-bioverse-dev.def >> "$PRJ_PATH/build.log"
 
+## Also build the development environment and push it
+docker build --progress=plain --tag "allumik/r-bioverse:dev" - < "$PRJ_PATH/dockerfiles/r-bioverse-dev.Dockerfile" >> "$PRJ_PATH/build.log"
+docker image push allumik/r-bioverse:dev
+
 ## ☕️
 
 ## Anything went wrong while browsing HackerNews?
