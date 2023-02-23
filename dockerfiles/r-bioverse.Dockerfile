@@ -34,7 +34,7 @@ ENV BASE_DEPS='''\
   libxml2-dev \
   libjpeg-turbo \
   libpng-dev \
-  libgit2-dev \
+  libgit2-dev git \
   libssh2-dev \
   openssl-dev \
   pcre-dev pcre2-dev \

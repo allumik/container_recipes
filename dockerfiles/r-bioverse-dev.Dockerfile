@@ -9,7 +9,6 @@
 FROM allumik/r-bioverse
 LABEL maintainer="Alvin Meltsov <alvinmeltsov@gmail.com>"
 
-
 ## Install additional R packages
 RUN install2.r --ncpus 8 --skipinstalled --error -r http://cran.rstudio.com/ \
   ggpubr ggvenn heatmaply viridis RColorBrewer glue magrittr \

@@ -21,7 +21,7 @@ docker image push allumik/r-bioverse
 
 #Or run it in a Docker container instead of WSL
 Get-Content "$projdir/dockerfiles/sif-build.Dockerfile" | docker build --progress=plain --tag "allumik/sif-builder" - *>> "$projdir/build.log"
-docker run --privileged -v $projdir\:/app allumik/sif-builder build /app/r-bioverse-dev.sif /app/def_files/r-bioverse-dev.def *>> "$projdir/build.log"
+docker run --privileged -v $projdir\:/app allumik/sif-builder build --force /app/r-bioverse-dev.sif /app/def_files/r-bioverse-dev.def *>> "$projdir/build.log"
 
 
 ## Aaand go get a cup of coffee ☕️!
