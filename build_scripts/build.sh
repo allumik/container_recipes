@@ -21,7 +21,7 @@ docker build --progress=plain --tag "allumik/sif-builder" - < "$PRJ_PATH/dockerf
 # --force  to overwrite current SIF
 docker run --privileged -v "$PRJ_PATH":"/app" allumik/sif-builder build /app/r-bioverse-dev.sif /app/def_files/r-bioverse-dev.def >> "$PRJ_PATH/build.log"
 
-## Build the docker dev image for VSCode etc
+## Also build the development environment and push it
 docker build --progress=plain --tag "allumik/r-bioverse:dev" - < "$PRJ_PATH/dockerfiles/r-bioverse-dev.Dockerfile" >> "$PRJ_PATH/build.log"
 docker image push allumik/r-bioverse:dev
 

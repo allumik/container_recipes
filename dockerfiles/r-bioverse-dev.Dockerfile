@@ -6,7 +6,7 @@
 #### Other examples:
 ## https://github.com/r-hub/r-minimal/blob/master/Dockerfile
 
-FROM allumik/r-bioverse
+FROM allumik/r-bioverse:latest
 LABEL maintainer="Alvin Meltsov <alvinmeltsov@gmail.com>"
 
 ## Install additional R packages

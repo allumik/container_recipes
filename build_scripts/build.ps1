@@ -23,6 +23,9 @@ docker image push allumik/r-bioverse
 Get-Content "$projdir/dockerfiles/sif-build.Dockerfile" | docker build --progress=plain --tag "allumik/sif-builder" - *>> "$projdir/build.log"
 docker run --privileged -v $projdir\:/app allumik/sif-builder build --force /app/r-bioverse-dev.sif /app/def_files/r-bioverse-dev.def *>> "$projdir/build.log"
 
+## Also build the dev environment as Docker container and push it
+Get-Content "$projdir\dockerfiles\r-bioverse-dev.Dockerfile" | docker build --progress=plain --tag "allumik/r-bioverse:dev" - *>> "$projdir/build.log"
+docker image push allumik/r-bioverse:dev
 
 ## Aaand go get a cup of coffee ☕️!
 
