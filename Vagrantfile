@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.provider "vmware" do |vb|
+  config.vm.provider "virtualbox" do |vb|
     # Customize the number of cpus on the VM:
     vb.cpus = "2"
 
