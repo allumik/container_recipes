@@ -6,10 +6,11 @@ ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ## Alpine does not detect timezone
 ENV TZ=UTC
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # install the apptainer package in the testing
 RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-  && apk add --no-cache ca-certificates libattr apptainer-suid@testing squashfs-tools \
+  && apk add --no-cache ca-certificates libattr apptainer-suid@testing squashfs-tools tar git coreutils \
   && rm -rf /tmp/* /var/cache/apk/*
 
 # setup cloud.sycloud.io as a remote library for compatibility with

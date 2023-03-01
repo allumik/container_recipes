@@ -1,5 +1,5 @@
 ## >>> "space ranger runner" <<<
-## space ranger runner defined as a apptainer image
+## space ranger binary defined as a apptainer image
 
 Bootstrap: docker
 From: alpine:3.15.5
@@ -9,32 +9,56 @@ From: alpine:3.15.5
   Alpine_version 3.15.5
 
 %help
-  Image for running Space Ranger (https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/what-is-space-ranger) in a Singularity image. Building this image requires:
-    * Space Ranger installer package from https://support.10xgenomics.com/spatial-gene-expression/software/downloads/latest
-    * Link to corresponding reference genome (find it on the same page on the previous step)
+  Image for running Space Ranger (https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/what-is-space-ranger) in a Singularity image. Building this image requires a Space Ranger installer package from https://support.10xgenomics.com/spatial-gene-expression/software/downloads/latest.
+
+  Set variable `SR_INSTALLER` for to specify the location of the Space Ranger installer tarball. For this, define a variable `APPTAINERENV_SR_INSTALLER=/path/to/file.tar.gz` during `apptainer build`.
+
+%setup
+  ## check if SR_INSTALLER is set, exit if unset
+  if [ -z ${APPTAINERENV_SR_INSTALLER+x} ]; then
+    echo "Set Space Ranger installer path for variable 'SR_INSTALLER'.\nExample: APPTAINERENV_SR_INSTALLER=/path/file.tar.gz" >&2
+    exit 1
+  fi
+
+  ## have to transfer files here, as the %files section does not intrepret variables
+  cp "$APPTAINERENV_SR_INSTALLER" "$APPTAINER_ROOTFS/opt"
+  ## NOTE: this does not work actually...
+  APPTAINERENV_NOW="${date}"
 
 %environment
   ## Locale settings
-  export LC_ALL="en_US.UTF-8"
-  export LANG="en_US.UTF-8"
+  export LC_ALL='en_US.UTF-8'
+  export LANG='en_US.UTF-8'
   ## Alpine does not detect timezone
-  export TZ="UTC"
+  export TZ='UTC'
 
 %post
   ## Locale settings
-  export LC_ALL="en_US.UTF-8"
-  export LANG="en_US.UTF-8"
+  export LC_ALL='en_US.UTF-8'
+  export LANG='en_US.UTF-8'
   ## Alpine does not detect timezone
-  export TZ="UTC"
+  export TZ='UTC'
+  SR_LOC="${SR_INSTALLER%.*.*}"
 
-  apk add --no-cache wget
+  ## add some buildtime environment variables to runtime
+  echo "export PATH=\"/opt/$SR_LOC/:$PATH\"" >> $APPTAINER_ENVIRONMENT
+  echo "export NOW=\"$NOW\"" >> $APPTAINER_ENVIRONMENT
 
-  cd /opt
-
-  ## and then import the installer tar, for example "spaceranger-2.0.1.tar.gz"
-
-  ## also required codependency is to have relevant genome 
+  ## install finally spaceranger :)
+  tar -xzvf "/opt/$SR_INSTALLER" -C "/opt/"
+  chmod +x "/opt/$SR_LOC/spaceranger"
 
 %test
-  ## test is installed binaries are in the PATH
-  spaceranger || true
+  ## show set environment variables
+  echo "$PATH"
+  echo "$NOW"
+  ## test if installed binary is in the PATH
+  if ! [ -x "$(command -v spaceranger)" ]; then
+    echo "Executable `spaceranger` seems not to be in PATH..." >&2
+    exit 1
+  fi
+
+%runscript
+  echo "Container was created $NOW"
+  echo "Arguments received: $*"
+  exec spaceranger "$@"
