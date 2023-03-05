@@ -8,9 +8,14 @@ ENV LANG=en_US.UTF-8
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# install the apptainer package in the testing
+## Install the apptainer package in the testing branch. Also installed:
+# * coreutils for basic tools to be present on whatever apptainer needs
+# * git if you want to download repos in setup
+# * full tar to unpack tarballs
+# * setup timezone as /etc/localtime is needed during default apptainer mounting
 RUN echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-  && apk add --no-cache ca-certificates libattr apptainer-suid@testing squashfs-tools tar git coreutils \
+  && apk add --no-cache ca-certificates libattr apptainer-suid@testing squashfs-tools tar git coreutils alpine-conf \
+  && setup-timezone -z "$TZ" \
   && rm -rf /tmp/* /var/cache/apk/*
 
 # setup cloud.sycloud.io as a remote library for compatibility with
@@ -29,6 +34,9 @@ RUN apptainer remote add --no-login SylabsCloud cloud.sycloud.io \
 #   && chmod 0440 /etc/sudoers.d/$NEWUSER \
 #   && echo ${NEWUSER}:100000:65536 >/etc/subuid \
 #   && echo ${NEWUSER}:100000:65536 >/etc/subgid
+# USER appuser
+# RUN mkdir ~/app
+# WORKDIR ~/appuser
 
 ## setup workdir to mount onto
 RUN mkdir /app

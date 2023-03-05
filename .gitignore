@@ -10,3 +10,6 @@ cache
 
 ## ignore vagrant stuff
 .vagrant
+
+## ignore other stuff
+*tar*

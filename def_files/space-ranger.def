@@ -2,11 +2,10 @@
 ## space ranger binary defined as a apptainer image
 
 Bootstrap: docker
-From: alpine:3.15.5
+From: debian:stable-slim
 
 %labels
   Maintainer Alvin Meltsov
-  Alpine_version 3.15.5
 
 %help
   Image for running Space Ranger (https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/what-is-space-ranger) in a Singularity image. Building this image requires a Space Ranger installer package from https://support.10xgenomics.com/spatial-gene-expression/software/downloads/latest.
@@ -27,26 +26,23 @@ From: alpine:3.15.5
 
 %environment
   ## Locale settings
-  export LC_ALL='en_US.UTF-8'
   export LANG='en_US.UTF-8'
   ## Alpine does not detect timezone
   export TZ='UTC'
 
 %post
   ## Locale settings
-  export LC_ALL='en_US.UTF-8'
   export LANG='en_US.UTF-8'
   ## Alpine does not detect timezone
   export TZ='UTC'
   SR_LOC="${SR_INSTALLER%.*.*}"
 
   ## add some buildtime environment variables to runtime
-  echo "export PATH=\"/opt/$SR_LOC/:$PATH\"" >> $APPTAINER_ENVIRONMENT
+  echo "export PATH=\"/opt/$SR_LOC:$PATH\"" >> $APPTAINER_ENVIRONMENT
   echo "export NOW=\"$NOW\"" >> $APPTAINER_ENVIRONMENT
 
   ## install finally spaceranger :)
   tar -xzvf "/opt/$SR_INSTALLER" -C "/opt/"
-  chmod +x "/opt/$SR_LOC/spaceranger"
 
 %test
   ## show set environment variables
@@ -59,6 +55,6 @@ From: alpine:3.15.5
   fi
 
 %runscript
-  echo "Container was created $NOW"
+  echo "Container was created on $NOW"
   echo "Arguments received: $*"
-  exec spaceranger "$@"
+  spaceranger $@
