@@ -73,6 +73,7 @@ ENV ADDIT_DEPS='''\
   tiff tiff-dev \
   libx11 \
   lua \
+  python3 py3-pip \
   '''
 
 RUN apk add --no-cache --virtual addit ${ADDIT_DEPS}
@@ -119,6 +120,9 @@ RUN installGithub.r --deps TRUE \
 ## Install basic + tidyverse packages in R
 # Force tinytex instalation just to be sure that it gets linked to R
 RUN install2.r --ncpus 8 --skipinstalled --error -r http://cran.rstudio.com/ \
-  BiocManager haven tidyverse plotly devtools languageserver renv knitr \
+  BiocManager haven tidyverse plotly devtools languageserver renv knitr httpgd \
   && r -e "tinytex::install_tinytex(force = T)" \
   && rm -rf /tmp/downloaded_packages /tmp/*.rds
+
+## setup python3, pip and install radian
+RUN pip3 install --user radian
