@@ -36,5 +36,6 @@ From: ubuntu:noble
 
 %test
   ## test if the binaries are available
-  command -v quarto >/dev/null 2>&1 && quarto --version >/dev/null 2>&1 && echo "Quarto is installed and functional." || echo "Quarto is not installed or not working."
+  command -v code >/dev/null 2>&1 && code --version >/dev/null 2>&1 && \
+    echo "Code is installed and functional." || echo "Code is not installed or not working."
 

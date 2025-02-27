@@ -44,5 +44,6 @@ From: ubuntu:noble
 
 %test
   ## test if the binaries are available
-  command -v quarto >/dev/null 2>&1 && quarto --version >/dev/null 2>&1 && echo "Quarto is installed and functional." || echo "Quarto is not installed or not working."
+  command -v quarto >/dev/null 2>&1 && quarto --version >/dev/null 2>&1 && \
+    echo "Quarto is installed and functional." || echo "Quarto is not installed or not working."
 
