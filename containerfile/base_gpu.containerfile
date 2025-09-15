@@ -44,6 +44,3 @@ RUN apt-get update -qq && \
 RUN wget --no-check-certificate https://quarto.org/download/latest/quarto-linux-amd64.deb && \
   dpkg --install quarto-linux-amd64.deb && \
   rm quarto-linux-amd64.deb
-
-# Test Quarto installation
-CMD ["sh", "-c", "command -v quarto >/dev/null 2>&1 && quarto --version >/dev/null 2>&1 && echo 'Quarto is installed and functional.' || echo 'Quarto is not installed or not working.'"]

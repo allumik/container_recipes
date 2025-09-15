@@ -1,0 +1,75 @@
+Bootstrap: docker
+From: alpine:3.22
+
+%help
+    This container contains the 'vis' text editor.
+    When run, it will start the vis editor directly.
+
+    Usage:
+    $ singularity run vis.sif [arguments] [filename]
+    
+    Example:
+    $ singularity run vis.sif my_file.txt
+
+%labels
+    Author YourName
+    Version 2.0
+    Base Alpine 3.22
+
+%post
+    # This section corresponds to the RUN commands in the Dockerfile.
+    # It executes during the container build process.
+
+    # 1. Install all necessary packages using apk, including git
+    apk update && apk add --upgrade --no-cache \
+        acl-dev \
+        acl-static \
+        ca-certificates \
+        fortify-headers \
+        gcc \
+        git \
+        libtermkey-dev \
+        lua5.4-dev \
+        lua5.4-lpeg \
+        lua-lpeg-dev \
+        make \
+        musl-dev \
+        ncurses-dev \
+        ncurses-static \
+        gocryptfs \
+        tar \
+        wget \
+        xz \
+        xz-dev \
+        xz-static
+
+    # 2. Perform the configuration tweaks with sed and mv
+    sed -i 's/Libs: /Libs: -L${INSTALL_CMOD} /' /usr/lib/pkgconfig/lua5.4.pc
+    mv /usr/lib/lua/5.4/lpeg.a /usr/lib/lua/5.4/liblpeg.a
+    sed -i 's/-ltermkey/-ltermkey -lunibilium/' /usr/lib/pkgconfig/termkey.pc
+
+    # 3. Download, compile, and install libuntar from source
+    mkdir -p /build
+    cd /build
+    wget https://github.com/martanne/libuntar/tarball/7c7247b442b021588f6deba78b60ef3b05ab1e0c -O libuntar.tar.gz
+    tar xf libuntar.tar.gz
+    cd *-libuntar-*
+    make
+    mkdir -p /usr/local/include
+    cp lib/libuntar.h /usr/local/include
+    cp lib/libuntar.a /usr/local/lib
+    rm -rf /build
+
+    # 4. NEW: Download, compile, and install the 'vis' editor itself
+    cd /tmp
+    git clone https://github.com/martanne/vis
+    cd vis
+    ./configure --enable-static
+    make
+    make install # Installs 'vis' to /usr/local/bin
+    rm -rf /tmp/vis
+
+%runscript
+    # This section now executes 'vis' instead of a shell.
+    # The "$@" passes any command-line arguments (like filenames) to vis.
+    exec vis "$@"
