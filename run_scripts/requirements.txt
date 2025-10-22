@@ -1,0 +1,50 @@
+# It is a conversion of the 'sc-analysis' conda environment.yml file.
+# Meant to be used with a preloaded torch docker file with GPU enabled.
+# Conda-specific features (like 'channels' and non-Python packages) are removed.
+
+## from conda yml file
+# name: sc-analysis
+# channels:
+# - pytorch
+# - nvidia
+# - conda-forge
+# - bioconda
+
+python-dotenv
+ipykernel
+jupyter-cache
+notebook
+ipywidgets
+itables
+nbformat
+nbclient
+
+pandas>=2.0
+scikit-learn
+scipy
+h5py
+
+# bio stuff for loading stuff
+anndata
+scanpy
+squidpy>=1.6.0
+
+altair
+seaborn
+openpyxl
+vl-convert-python
+
+# Packages from the 'pip' section
+pylance
+matplotlib
+tangram-sc==1.0.4
+# SpaceFlow==1.0
+
+
+## from conda yml file
+# # GPU stuff
+# # pytorch 2.0.1 is the last one to support cuda 11.7
+# - pytorch==2.1.2
+# - torchvision==0.16.2
+# - torchaudio==2.1.2
+# - pytorch-cuda==12.1
