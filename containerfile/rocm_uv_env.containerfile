@@ -10,6 +10,10 @@ ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
+
+# Install jupyter server and euporie first
+RUN uv pip install --no-cache euporie
+
 # Copy your local requirements.txt into the container
 COPY requirements.txt .
 
