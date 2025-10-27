@@ -12,6 +12,8 @@ From: ubuntu:noble
   Kinda minimal image for a development environment including:
   * wget
   * quarto
+  * uv
+  * euporie
 
 %post
   ## Update debian (unnecessary when previously updated) and install the deps
@@ -38,12 +40,55 @@ From: ubuntu:noble
     && apt clean
 
   # add quarto for document printing
-  wget https://quarto.org/download/latest/quarto-linux-amd64.deb &&
-    dpkg --install quarto-linux-amd64.deb &&
+  wget https://quarto.org/download/latest/quarto-linux-amd64.deb && \
+    dpkg --install quarto-linux-amd64.deb && \
     rm quarto-linux-amd64.deb
 
-%test
-  ## test if the binaries are available
-  command -v quarto >/dev/null 2>&1 && quarto --version >/dev/null 2>&1 && \
-    echo "Quarto is installed and functional." || echo "Quarto is not installed or not working."
+  ## Install uv to a system-wide location
+  # Run the installer, which places uv in /root/.local/bin
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  # Move the executable to a system-wide path
+  mv /root/.local/bin/uv /usr/local/bin/uv
 
+  ## Clean the uv cache
+  uv cache clean
+
+  ## Clean up apt cache
+  apt-get autoremove -y
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+
+%runscript
+  #!/bin/bash
+  set -e
+
+  # Define a path for the virtual environment inside the user's home directory
+  VENV_PATH="$HOME/.local/share/euporie_singularity_venv"
+  EUPORIE_EXEC="$VENV_PATH/bin/euporie"
+
+  # Check if the application is already installed in the venv
+  if [ ! -f "$EUPORIE_EXEC" ]; then
+    echo "--- Euporie not found, setting up virtual environment. ---"
+    
+    # Create the virtual environment using the container's python
+    uv venv "$VENV_PATH"
+    
+    # Install euporie into the new virtual environment
+    # The --python flag ensures uv uses the correct interpreter
+    uv pip install --python "$VENV_PATH/bin/python" euporie
+    
+    echo "--- Installation complete. ---"
+  fi
+
+  # Execute the application, passing along any command-line arguments
+  exec "$EUPORIE_EXEC" "$@"
+
+%test
+  ## Test if the binaries are available and executable
+  echo "--- Testing Quarto ---"
+  command -v quarto && quarto --version || (echo "Quarto test FAILED" && exit 1)
+  
+  echo "--- Testing uv ---"
+  command -v uv && uv --version || (echo "uv test FAILED" && exit 1)
+  
+  echo "All tests PASSED."
