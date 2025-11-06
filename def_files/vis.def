@@ -12,7 +12,7 @@ From: alpine:3.22
     $ singularity run vis.sif my_file.txt
 
 %labels
-    Author YourName
+    Author allumik
     Version 2.0
     Base Alpine 3.22
 

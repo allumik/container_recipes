@@ -81,7 +81,7 @@ podman run \
   "${VOLUME_MOUNTS[@]}" \
   --name py_env \
   "$PODMAN_TAG" \
-  bash -c "EUPORIE_GRAPHICS=sixel EUPORIE_EDIT_MODE=vi EUPORIE_CLIPBOARD=external EUPORIE_MOUSE_SUPPORT=true euporie-console"
+  bash -c "EUPORIE_GRAPHICS=sixel EUPORIE_EDIT_MODE=vi EUPORIE_CLIPBOARD=terminal EUPORIE_MOUSE_SUPPORT=true euporie-console"
 
 # commands to use
 # -c "jupyter server --allow-root"
