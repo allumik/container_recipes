@@ -35,6 +35,7 @@ RUN apt-get update -qq && \
     libfontconfig-dev \
     libjpeg8-dev \
     libffi-dev \
+    libsixel \
     zlib1g-dev && \
   apt-get autoremove -y && \
   apt-get clean && \

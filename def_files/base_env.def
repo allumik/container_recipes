@@ -12,6 +12,7 @@ From: ubuntu:noble
   Kinda minimal image for a development environment including:
   * wget
   * quarto
+  * uv
 
 %post
   ## Update debian (unnecessary when previously updated) and install the deps
@@ -19,31 +20,42 @@ From: ubuntu:noble
     && apt install -y \
       build-essential gpg wget curl locales \
       automake autoconf pkg-config bzip2 cmake \
-      glibc-source \
-      libc-devtools \
-      libc6 libc6-dev \
-      libxml2-dev \
-      libxslt1-dev \
-      libpng-dev \
-      libgit2-dev \
-      libssl-dev \
-      libssh2-1-dev \
-      libcurl4-openssl-dev \
+      glibc-source libc-devtools libc6 libc6-dev \
+      libxml2-dev libxslt1-dev \
+      libpng-dev libjpeg8-dev libsixel-bin \
+      libgit2-dev libssl-dev libssh2-1-dev libcurl4-openssl-dev \
       libbz2-dev liblzma-dev \
       libfontconfig-dev \
-      libjpeg8-dev \
       libffi-dev \
       zlib1g-dev \
     && apt autoremove -y \
     && apt clean
 
   # add quarto for document printing
-  wget https://quarto.org/download/latest/quarto-linux-amd64.deb &&
-    dpkg --install quarto-linux-amd64.deb &&
+  wget https://quarto.org/download/latest/quarto-linux-amd64.deb && \
+    dpkg --install quarto-linux-amd64.deb && \
     rm quarto-linux-amd64.deb
 
-%test
-  ## test if the binaries are available
-  command -v quarto >/dev/null 2>&1 && quarto --version >/dev/null 2>&1 && \
-    echo "Quarto is installed and functional." || echo "Quarto is not installed or not working."
+  ## Install uv to a system-wide location
+  # Run the installer, which places uv in /root/.local/bin
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  # Move the executable to a system-wide path
+  mv /root/.local/bin/uv /usr/local/bin/uv
 
+  ## Clean the uv cache
+  uv cache clean
+
+  ## Clean up apt cache
+  apt-get autoremove -y
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+
+%test
+  ## Test if the binaries are available and executable
+  echo "--- Testing Quarto ---"
+  command -v quarto && quarto --version || (echo "Quarto test FAILED" && exit 1)
+  
+  echo "--- Testing uv ---"
+  command -v uv && uv --version || (echo "uv test FAILED" && exit 1)
+  
+  echo "All tests PASSED."
