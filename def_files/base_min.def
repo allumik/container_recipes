@@ -10,12 +10,12 @@ From: ubuntu:noble
 
 %help
   Kinda minimal image for a development environment including:
+  * dependencies for many R libraries
+  * wget
   * uv
-  * R package dependencies
-  * code cli executable, usable for tunnelling or ssh remote connections
+  * build-essentials
 
 %post
-
   ## Update debian (unnecessary when previously updated) and install the deps
   apt update -q -q && apt upgrade -y \
     && apt install -y \
@@ -46,18 +46,8 @@ From: ubuntu:noble
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 
-  ## install code cli
-  wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
-  install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
-  sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
-  rm -f packages.microsoft.gpg
-
 %test
   echo "--- Testing uv ---"
   command -v uv && uv --version || (echo "uv test FAILED" && exit 1)
   
-  ## test if the binaries are available
-  command -v code >/dev/null 2>&1 && code --version >/dev/null 2>&1 && \
-    echo "Code is installed and functional." || echo "Code is not installed or not working."
-
   echo "All tests PASSED."
