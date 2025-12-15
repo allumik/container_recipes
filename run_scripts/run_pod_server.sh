@@ -2,11 +2,6 @@
 
 ## Run it with
 # ./run_pod_jupyter.sh PODMAN_TAG UV_ENV PROJ_FOLDER CONTAINERFILE [ENV_FILE]
-# PODMAN_TAG    <- tag for the container
-# UV_ENV        <- requirements.txt file for the uv build
-# PROJ_FOLDER   <- The project folder to use as working directory and mount point
-# CONTAINERFILE <- The path to the Containerfile
-# ENV_FILE      <- Optional .env file with folders that need to be mounted
 
 set -euo pipefail # Exit on error, unset variable, or pipe failure
 
@@ -14,6 +9,11 @@ set -euo pipefail # Exit on error, unset variable, or pipe failure
 if [[ $# -lt 4 ]] || [[ $# -gt 5 ]]; then
   echo "Error: Invalid number of arguments." >&2
   echo "Usage: $0 PODMAN_TAG REQ_FILE PROJ_FOLDER CONTAINERFILE [ENV_FILE]" >&2
+  echo "PODMAN_TAG    <- tag for the container"
+  echo "UV_ENV        <- requirements.txt file for the uv build"
+  echo "PROJ_FOLDER   <- The project folder to use as working directory and mount point"
+  echo "CONTAINERFILE <- The path to the Containerfile"
+  echo "ENV_FILE      <- Optional .env file with folders that need to be mounted"
   exit 1
 fi
 
@@ -84,8 +84,8 @@ podman run \
   bash -c "EUPORIE_GRAPHICS=sixel EUPORIE_EDIT_MODE=vi EUPORIE_CLIPBOARD=terminal EUPORIE_MOUSE_SUPPORT=true euporie-console"
 
 # commands to use
-# -c "jupyter server --allow-root"
-# -c "EUPORIE_GRAPHICS=sixel EUPORIE_EDIT_MODE=vi EUPORIE_CLIPBOARD=external EUPORIE_MOUSE_SUPPORT=true euporie-console"
+# bash -c "jupyter server --allow-root"
+# bash -c "EUPORIE_GRAPHICS=sixel EUPORIE_EDIT_MODE=vi EUPORIE_CLIPBOARD=terminal EUPORIE_MOUSE_SUPPORT=true euporie-console"
 
 
 ## Build Singularity image without cache
