@@ -1,0 +1,61 @@
+Bootstrap: docker
+From: ubuntu:resolute
+
+%labels
+  Maintainer Alvin Meltsov
+  Ubuntu Resolute 26.04
+
+%help
+  Kinda minimal image for a development environment including:
+  * wget
+  * R with BioConductor
+
+%environment
+  export LANG=en_US.UTF-8
+  export LC_ALL=en_US.UTF-8
+  export TZ=Europe/Amsterdam
+
+%post
+  ## Prevent debconf interactive prompts
+  export DEBIAN_FRONTEND=noninteractive
+  export TZ=Europe/Amsterdam
+  ## Update debian (unnecessary when previously updated) and install the deps
+  apt update -q -q && apt upgrade -y \
+    && apt install -y \
+      build-essential gpg wget curl locales \
+      automake autoconf pkg-config bzip2 cmake \
+      glibc-source libc-devtools libc6 libc6-dev \
+      libxml2-dev libxslt1-dev \
+      libpng-dev libjpeg8-dev libsixel-bin \
+      libgit2-dev libssl-dev libssh2-1-dev libcurl4-openssl-dev \
+      libbz2-dev liblzma-dev \
+      libfontconfig-dev \
+      libffi-dev \
+      zlib1g-dev \
+      r-base r-base-dev \
+    && apt autoremove -y \
+    && apt clean
+
+  ## Set Locale and Timezone
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+  sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+  locale-gen en_US.UTF-8
+  update-locale LANG=en_US.UTF-8
+
+  ## Install MutationalPatterns via BioConductor
+  ## Explicitly setting version='3.22' to match R 4.5 requirements
+  Rscript -e "install.packages('BiocManager', repos='https://cloud.r-project.org')"
+  Rscript -e "BiocManager::install('MutationalPatterns', version = '3.22', ask = FALSE, update = TRUE)"
+
+  ## Clean up apt cache
+  apt-get autoremove -y
+  apt-get clean
+  rm -rf /var/lib/apt/lists/*
+
+%test
+  ## Verify R installation and version
+  R --version
+  
+  ## Verify MutationalPatterns can be loaded
+  Rscript -e "if (!requireNamespace('MutationalPatterns', quietly = TRUE)) q(status=1)"
+  Rscript -e "library(MutationalPatterns); message('MutationalPatterns loaded successfully')"
