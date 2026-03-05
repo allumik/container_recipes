@@ -45,7 +45,14 @@ From: ubuntu:resolute
   ## Install MutationalPatterns via BioConductor
   ## Explicitly setting version='3.22' to match R 4.5 requirements
   Rscript -e "install.packages('BiocManager', repos='https://cloud.r-project.org')"
-  Rscript -e "BiocManager::install('MutationalPatterns', version = '3.22', ask = FALSE, update = TRUE)"
+  Rscript -e "BiocManager::install( \
+    c('MutationalPatterns', \
+    'BSgenome.Hsapiens.UCSC.hg38', \
+    'gridExtra', \
+    'ccfindR'), \
+    version = '3.22', \
+    ask = FALSE, \
+    update = TRUE)"
 
   ## Clean up apt cache
   apt-get autoremove -y
