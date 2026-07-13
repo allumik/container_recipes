@@ -1,5 +1,6 @@
 ## >>> "base runtime container for Abacus HPC" <<<
 ## allumik/base_abacus
+#
 
 Bootstrap: docker
 From: ubuntu:noble
@@ -13,9 +14,11 @@ From: ubuntu:noble
   * wget
   * quarto
   * uv
+  * nodejs
 
 %post
   ## Update debian (unnecessary when previously updated) and install the deps
+  #
   apt update -q -q && apt upgrade -y \
     && apt install -y \
       build-essential gpg wget curl locales \
@@ -30,32 +33,49 @@ From: ubuntu:noble
       zlib1g-dev \
     && apt autoremove -y \
     && apt clean
+  #
 
   # add quarto for document printing
+  #
   wget https://quarto.org/download/latest/quarto-linux-amd64.deb && \
     dpkg --install quarto-linux-amd64.deb && \
     rm quarto-linux-amd64.deb
 
+  # Install Node.js via NodeSource
+  curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
+
   ## Install uv to a system-wide location
   # Run the installer, which places uv in /root/.local/bin
+  #
   curl -LsSf https://astral.sh/uv/install.sh | sh
   # Move the executable to a system-wide path
+  #
   mv /root/.local/bin/uv /usr/local/bin/uv
 
   ## Clean the uv cache
+  #
   uv cache clean
 
   ## Clean up apt cache
+  #
   apt-get autoremove -y
   apt-get clean
   rm -rf /var/lib/apt/lists/*
 
 %test
   ## Test if the binaries are available and executable
+  #
   echo "--- Testing Quarto ---"
   command -v quarto && quarto --version || (echo "Quarto test FAILED" && exit 1)
+  #
   
   echo "--- Testing uv ---"
   command -v uv && uv --version || (echo "uv test FAILED" && exit 1)
+  #
   
+  echo "--- Testing Node.js ---"
+  command -v node && node --version || (echo "Node.js test FAILED" && exit 1)
+
   echo "All tests PASSED."
+  #
